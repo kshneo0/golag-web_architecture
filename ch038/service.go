@@ -2,10 +2,13 @@ package architecture
 
 import "fmt"
 
+// Person is how the architecture ackage stores a person
 type Person struct {
 	First string
 }
 
+// Accessor is hoe to store or retrive a person.
+// When retrive aperson, if they do not exist, return the zero value
 type Accessor interface {
 	Save(n int, p Person)
 	Retrieve(n int) Person
