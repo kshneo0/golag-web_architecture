@@ -1,6 +1,7 @@
 package architecture
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -25,4 +26,16 @@ func TestPut(t *testing.T){
 	if got != p {
 		t.Fatalf("What %v, got %v", p, got)
 	}
+}
+
+func ExamplePut() {
+	mdb := Db{}
+	p := Person{
+		First:"James",
+	}
+
+	Put(mdb,1,p)
+	got := mdb.Retrieve(1) 
+	fmt.Println(got)
+	// Output: {James}
 }
