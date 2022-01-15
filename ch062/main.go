@@ -3,26 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/web_archi/ch062/session"
 )
 
 func main() {
-	ctx := context.WithValue(context.Background(),"userID", 12345)
-	ctx = context.WithValue(ctx,1, "admin")
-	if v := ctx.Value("userID"); v != nil {
-		fmt.Println(v)
-	} else {
-		fmt.Println("no value associated with that key")
-	}
-
-	if v := ctx.Value(1); v!= nil {
-		fmt.Println(v)
-	} else {
-		fmt.Println("no value associated with that key")
-	}
-
-	if v := ctx.Value(2); v!= nil {
-		fmt.Println(v)
-	} else {
-		fmt.Println("no value associated with that key")
-	}
+	ctx := context.Background()
+	ctx = session.SetUserID(ctx,1)
+	ctx = session.SetIsAdmin(ctx,true)
+	i := session.GetUserID(ctx)
+	b := session.GetIsAdmin(ctx)
+	fmt.Printf("User %d is admin %t\n",i,b)
 }
