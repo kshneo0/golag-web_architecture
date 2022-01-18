@@ -45,22 +45,32 @@ func (w *writeFile) Err() error {
 }
 
 func main() {
-	f, err := os.Create("file.txt")
+	f := newWriteFile("file.txt")
+	f.WriteString("Hello World")
+	f.WriteString("More Text!")
+	f.Close()
+
+	err := f.Err()
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = io.WriteString(f, "Hello world")
-	if err != nil {
-		panic(err)
-	}
+	// f, err := os.Create("file.txt")
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	_, err = io.WriteString(f, "More Text!")
-	if err != nil {
-		panic(err)
-	}
-	err = f.Close()
-	if err != nil {
-		panic(err)
-	}
+	// _, err = io.WriteString(f, "Hello world")
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// _, err = io.WriteString(f, "More Text!")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// err = f.Close()
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
