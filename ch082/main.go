@@ -1,9 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"os"
 )
+type writeFileError struct{
+	Op string
+	Err error
+}
+
+func (w writeFileError) Error() string {
+	return w.Err.Error()
+}
+
+func (w writeFileError) Unwrap() error {
+	return w.Err
+}
 
 type writeFile struct {
 	f * os.File
@@ -25,7 +38,12 @@ func (w *writeFile) WriteString(text string) {
 
 	_, err := io.WriteString(w.f, text)
 	if err != nil {
-		w.err = err
+		//w.err = err
+		w.err = writeFileError {
+			Op: "WritieString",
+			Err: fmt.Errorf("Failed wile writing a string: %w", err),
+		}
+		//w.err = fmt.Errorf("Failed wile writing a string: %w", err)
 	}
 }
 
@@ -40,6 +58,7 @@ func (w *writeFile) Close() {
 	}
 }
 
+// All errors returning from Err should be of type *WriteFileError
 func (w *writeFile) Err() error {
 	return w.err
 }
