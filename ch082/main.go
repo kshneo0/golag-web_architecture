@@ -5,33 +5,43 @@ import (
 	"io"
 	"os"
 )
-type writeFileError struct{
+type WriteFileError struct{
 	Op string
 	Err error
 }
 
-func (w writeFileError) Error() string {
+func (w WriteFileError) Error() string {
 	return w.Err.Error()
 }
 
-func (w writeFileError) Unwrap() error {
+func (w WriteFileError) Unwrap() error {
 	return w.Err
 }
 
-type writeFile struct {
+type WriteFile struct {
 	f * os.File
 	err error
 }
 
-func newWriteFile(filename string) *writeFile {
+func NewWriteFile(filename string) *WriteFile {
 	f, err := os.Create(filename)
-	return &writeFile{
-		f: f,
-		err: err,
+	if err != nil{
+		return &WriteFile{
+			f: f,
+			err: WriteFileError{
+				Op: "NewWriteFile-Create",
+				Err: fmt.Errorf("Error while creating a file: %w", err),
+			},
+		}
 	}
+	return &WriteFile{
+		f: f,
+		err: nil,
+	}
+	
 }
 
-func (w *writeFile) WriteString(text string) {
+func (w *WriteFile) WriteString(text string) {
 	if w.err != nil{
 		return
 	}
@@ -39,37 +49,47 @@ func (w *writeFile) WriteString(text string) {
 	_, err := io.WriteString(w.f, text)
 	if err != nil {
 		//w.err = err
-		w.err = writeFileError {
+		w.err = WriteFileError {
 			Op: "WritieString",
-			Err: fmt.Errorf("Failed wile writing a string: %w", err),
+			Err: fmt.Errorf("Failed while writing a string: %w", err),
 		}
 		//w.err = fmt.Errorf("Failed wile writing a string: %w", err)
 	}
 }
 
-func (w *writeFile) Close() {
-	if w.err != nil {
+func (w *WriteFile) Close() {
+	if w.f == nil {
 		return
 	}
 
 	err := w.f.Close()
 	if err != nil {
-		w.err = err
+		w.err = WriteFileError {
+			Op: "Close",
+			Err: fmt.Errorf("Failed while closing file: %w", err),
+		}
 	}
 }
 
 // All errors returning from Err should be of type *WriteFileError
-func (w *writeFile) Err() error {
+func (w *WriteFile) Err() error {
 	return w.err
 }
 
 func main() {
-	f := newWriteFile("file.txt")
+	f := NewWriteFile("file.txt")
 	f.WriteString("Hello World")
 	f.WriteString("More Text!")
 	f.Close()
 
 	err := f.Err()
+	// var fErr *WriteFileError
+	// if errors.As(err, &fErr) {
+	// 	if fErr.Op == "Close"{
+			
+	// 	}
+	// }
+
 	if err != nil {
 		panic(err)
 	}
